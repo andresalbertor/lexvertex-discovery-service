@@ -10,6 +10,9 @@ version = '0.1.0-SNAPSHOT'
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
+// Fat jar only — Dockerfile COPY build/libs/*.jar must not pick *-plain.jar
+jar { enabled = false }
+
 repositories { mavenCentral() }
 
 dependencyManagement {
@@ -24,7 +27,25 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+tasks.withType(Test).configureEach { useJUnitPlatform() }
+
+def jacocoExcludes = [
+        '**/DiscoveryServiceApplication.class',
+]
+
+tasks.named('jacocoTestReport') {
+    dependsOn test
+    reports { xml.required = true; html.required = true }
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: jacocoExcludes)
+    }))
+}
+
 jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: jacocoExcludes)
+    }))
     violationRules {
         rule {
             limit {
