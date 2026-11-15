@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * Smoke test del contexto Eureka Server.
  *
- * @author andres.restrepo@alternova.com
+ * @author andresalbertor@yahoo.com
  * @version 1.0
  * @since 2026-11-14
  */
